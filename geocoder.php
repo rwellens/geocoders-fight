@@ -2,7 +2,6 @@
 
 abstract class Geocoder {
 	
-	const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
 	const YAHOO_API_KEY = 'YOUR_YAHOO_API_KEY';
 	
 	public function getLatLng($location) {
@@ -10,11 +9,19 @@ abstract class Geocoder {
 		return $gc !== null ? $gc : self::getYahooLatLng($location);
 	}
 	
-	public function getGoogleLatLng($location) {
-		$wsurl = 'http://maps.google.com/maps/geo?q=%s&output=csv&key=%s';
-		$data = explode(',', file_get_contents(sprintf($wsurl, urlencode($location), self::GOOGLE_API_KEY)));
-		$coord = 200 === (int)$data[0] ? array((float)$data[2], (float)$data[3]) : null;
-		return $coord;
+
+	/**
+	 * @param string $address
+	 */
+	function coords($sAddress) {
+		if(!empty($sAddress)) {
+			$oXmlCoords = simplexml_load_file('http://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address='.urlencode($sAddress));
+			if($oXmlCoords->status == 'OK') { 
+				$oCoords = $oXmlCoords->result->geometry->location;
+				return array((float) $oCoords[0]->lat, (float) $oCoords[0]->lng);
+			}
+		}
+		return null;
 	}
 	
 	public function getYahooLatLng($location) {
