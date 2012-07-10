@@ -13,7 +13,7 @@ abstract class Geocoder {
 	/**
 	 * @param string $address
 	 */
-	function coords($location) {
+	function getGoogleLatLng($location) {
 		$oXmlCoords = simplexml_load_file('http://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address='.urlencode($location));
 		if($oXmlCoords->status == 'OK') { 
 			$oCoords = $oXmlCoords->result->geometry->location;
